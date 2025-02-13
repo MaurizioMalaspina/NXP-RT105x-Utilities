@@ -184,10 +184,10 @@ def fillFCB(config, fd, rdpt, **dic_argv):
         if data != 0:
             hex_data = f"0x{data:X}"
             spaces = ' ' * (9 - len(hex_data))
-            config.write(f" {hex_data}{spaces}// dec = {data}")
+            config.write(f" {hex_data},{spaces}// dec = {data}")
         else:
-            config.write(f" {data}")
-        config.write(",\n")
+            config.write(f" {data},")
+        config.write("\n")
     return rdpt
 
 def parse_s19_file(input_file, output_file, text_output_file):
