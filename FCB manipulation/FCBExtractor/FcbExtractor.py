@@ -112,7 +112,12 @@ def fillFCB(config, fd, rdpt, **dic_argv):
             dl += 1
             rdpt += 1
 
-        config.write(f" {data}")
+        if data != 0:
+            hex_data = f"0x{data:X}"
+            spaces = ' ' * (9 - len(hex_data))
+            config.write(f" {hex_data}{spaces}// dec = {data}")
+        else:
+            config.write(f" {data}")
         config.write(",\n")
     return rdpt
 
@@ -161,8 +166,8 @@ def bin_to_c_struct(binary_file):
         config.write("const flexspi_nor_config_t qspiflash_config = {\n")
         config.write("    .memConfig =\n")
         config.write("    {\n")
-        config.write("        .tag                           = FLEXSPI_CFG_BLK_TAG,     // 0x42464346UL\n")
-        config.write("        .version                       = FLEXSPI_CFG_BLK_VERSION, // 0x56010400UL\n")
+        config.write("        .tag              = FLEXSPI_CFG_BLK_TAG,     // 0x42464346UL\n")
+        config.write("        .version          = FLEXSPI_CFG_BLK_VERSION, // 0x56010400UL\n")
 
         pt = 8
         pt = fillFCB(config, fcb, pt, **memConfig) #fill the first 128 bytes
