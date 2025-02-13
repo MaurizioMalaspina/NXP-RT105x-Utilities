@@ -54,6 +54,25 @@ lut_pad = { 'FLEXSPI_1PAD': 0,
             'FLEXSPI_8PAD': 3
           }
 
+lut_comments = [
+    "Fast read quad I/O",
+    "Read status register",
+    "Reserved to the user: AVAILABLE",
+    "Write enable (for Sector Erase, Block Erase, Chip Erase, Page Program, Program Information Row, Write Status Register, Write Function Register, Set non-volatile Read Register, Set non-volatile Extended Read Register, and Write Autoboot Register operations)",
+    "Reserved to the user: AVAILABLE",
+    "Erase sector QSPI",
+    "Reserved to the user: AVAILABLE",
+    "Reserved to the user: AVAILABLE",
+    "Block erase 64kB",
+    "Input page program SPI 256 bytes",
+    "Reserved to the user: AVAILABLE",
+    "Full chip erase QSPI",
+    "Reserved to the user: AVAILABLE",
+    "Reserved to the user: AVAILABLE - also Read SFDP sequence in lookup table id stored in configuration block",
+    "Reserved to the user: AVAILABLE - also Restore 0-4-4/0-8-8 mode sequence id in lookupTable stored in config block",
+    "Dummy command as needed"
+]
+
 def split_LUT_item(lut_item, config):
     config.write("            FLEXSPI_LUT_SEQ(")
     data1 = lut_item[1] >> 2
@@ -166,8 +185,8 @@ def bin_to_c_struct(binary_file):
         config.write("const flexspi_nor_config_t qspiflash_config = {\n")
         config.write("    .memConfig =\n")
         config.write("    {\n")
-        config.write("        .tag              = FLEXSPI_CFG_BLK_TAG,     // 0x42464346UL\n")
-        config.write("        .version          = FLEXSPI_CFG_BLK_VERSION, // 0x56010400UL\n")
+        config.write("        .tag                           = FLEXSPI_CFG_BLK_TAG,     // 0x42464346UL\n")
+        config.write("        .version                       = FLEXSPI_CFG_BLK_VERSION, // 0x56010400UL\n")
 
         pt = 8
         pt = fillFCB(config, fcb, pt, **memConfig) #fill the first 128 bytes
@@ -176,6 +195,10 @@ def bin_to_c_struct(binary_file):
         config.write("        {\n")
         loop = 0
         while loop < 64:
+            if loop % 4 == 0: # Add a comment every 4 LUT entries
+                comment_index = loop // 4
+                if comment_index < len(lut_comments):
+                    config.write(f"            // {comment_index}: {lut_comments[comment_index]}\n")
             item = fcb[pt:(pt + 4)]
             split_LUT_item(item, config)
             pt += 4
